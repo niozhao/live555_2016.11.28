@@ -1,4 +1,4 @@
-COMPILE_OPTS =         $(INCLUDES) -I. -O -DSOCKLEN_T=int -DLOCALE_NOT_USED
+COMPILE_OPTS =         $(INCLUDES) -I. -O -DSOCKLEN_T=int -DLOCALE_NOT_USED -march=armv7-a -mfpu=vfpv3-d16 -mcpu=cortex-a8 -mthumb -mfloat-abi=softfp -MMD -MP -fpic -ffunction-sections -funwind-tables -fstack-protector-strong -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -no-canonical-prefixes -fno-integrated-as -I/home/nio/Code/Work/VLC/vlc-android-1_src/vlc/contrib/arm-linux-androideabi/include -fexceptions  -march=armv7-a -mfpu=vfpv3-d16 -mcpu=cortex-a8 -mthumb -mfloat-abi=softfp -MMD -MP -fpic -ffunction-sections -funwind-tables -fstack-protector-strong -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -no-canonical-prefixes -fno-integrated-as -I/home/nio/Code/Work/VLC/vlc-android-1_src/vlc/contrib/arm-linux-androideabi/include -g -O2
 C =                    c
 C_COMPILER =           $(CC)
 C_FLAGS =              $(COMPILE_OPTS) -DUSE_OUR_BZERO=1 -D__MINGW32__
