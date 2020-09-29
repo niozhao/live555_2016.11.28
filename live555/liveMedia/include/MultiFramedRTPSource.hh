@@ -46,6 +46,7 @@ protected:
   virtual Boolean packetIsUsableInJitterCalculation(unsigned char* packet,
 						    unsigned packetSize);
       // The default implementation returns True, but this can be redefined
+  virtual void fecPacketReady1(unsigned int, unsigned int, struct timeval, unsigned int);
 
 protected:
   Boolean fCurrentPacketBeginsFrame;
@@ -59,6 +60,8 @@ private:
   // redefined virtual functions:
   virtual void doGetNextFrame();
   virtual void setPacketReorderingThresholdTime(unsigned uSeconds);
+  void parseRTPPacket(BufferedPacket *packet);
+  bool checkPRTHeader(BufferedPacket *packet);
 
 private:
   void reset();
@@ -115,9 +118,11 @@ public:
   Boolean rtpMarkerBit() const { return fRTPMarkerBit; }
   Boolean& isFirstPacket() { return fIsFirstPacket; }
   unsigned bytesAvailable() const { return fPacketSize - fTail; }
+  unsigned packetSize() const { return fPacketSize; }
+  virtual void reset();
 
 protected:
-  virtual void reset();
+  
   virtual unsigned nextEnclosedFrameSize(unsigned char*& framePtr,
 					 unsigned dataSize);
       // The above function has been deprecated.  Instead, new subclasses should use:
@@ -156,4 +161,41 @@ public:
   virtual BufferedPacket* createNewPacket(MultiFramedRTPSource* ourSource);
 };
 
+
+////////// ReorderingPacketBuffer definition //////////
+
+class ReorderingPacketBuffer {
+public:
+	ReorderingPacketBuffer(BufferedPacketFactory* packetFactory);
+	virtual ~ReorderingPacketBuffer();
+	void reset();
+
+	BufferedPacket* getFreePacket(MultiFramedRTPSource* ourSource);
+	Boolean storePacket(BufferedPacket* bPacket);
+	BufferedPacket* getNextCompletedPacket(Boolean& packetLossPreceded);
+	void releaseUsedPacket(BufferedPacket* packet);
+	void freePacket(BufferedPacket* packet) {
+		if (packet != fSavedPacket) {
+			delete packet;
+		}
+		else {
+			fSavedPacketFree = True;
+		}
+	}
+	Boolean isEmpty() const { return fHeadPacket == NULL; }
+
+	void setThresholdTime(unsigned uSeconds) { fThresholdTime = uSeconds; }
+	void resetHaveSeenFirstPacket() { fHaveSeenFirstPacket = False; }
+
+private:
+	BufferedPacketFactory* fPacketFactory;
+	unsigned fThresholdTime; // uSeconds
+	Boolean fHaveSeenFirstPacket; // used to set initial "fNextExpectedSeqNo"
+	unsigned short fNextExpectedSeqNo;
+	BufferedPacket* fHeadPacket;
+	BufferedPacket* fTailPacket;
+	BufferedPacket* fSavedPacket;
+	// to avoid calling new/free in the common case
+	Boolean fSavedPacketFree;
+};
 #endif
