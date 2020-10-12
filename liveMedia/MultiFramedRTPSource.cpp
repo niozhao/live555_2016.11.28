@@ -112,6 +112,7 @@ void MultiFramedRTPSource::doGetNextFrame1() {
 		// Something's wrong with the header; reject the packet:
 		fReorderingBuffer->releaseUsedPacket(nextPacket);
 		fNeedDelivery = True;
+		envir().log("may lost frame! processSpecialHeader failed! a rtp packet dropped!\n");
 		continue;
       }
       nextPacket->skip(specialHeaderSize);
@@ -119,10 +120,13 @@ void MultiFramedRTPSource::doGetNextFrame1() {
 
     // Check whether we're part of a multi-packet frame, and whether
     // there was packet loss that would render this packet unusable:
+	bool bPrintLog = false;
     if (fCurrentPacketBeginsFrame) {
       if (packetLossPrecededThis || fPacketLossInFragmentedFrame) {  //当前这个rtp包是一帧的开始[开始新的一帧了]，若packetLossPrecededThis为true，表示先前有rtp包丢了，那么之前保存的数据全都不要了
 		// We didn't get all of the previous frame.
 		// Forget any data that we used from it:
+		  if (fSavedTo != fTo)
+			  envir().log("may lost frame! now start read a new frame, but the previous frame has lost!\n");
 		fTo = fSavedTo; fMaxSize = fSavedMaxSize;
 		fFrameSize = 0;
       }
@@ -130,11 +134,14 @@ void MultiFramedRTPSource::doGetNextFrame1() {
     } else if (packetLossPrecededThis) {
       // We're in a multi-packet frame, with preceding packet loss
       fPacketLossInFragmentedFrame = True;  //该rtp包是一帧数据的中间部分，但先前有包丢失了，所以拼不成一个完整帧了
+	  bPrintLog = true;
     }
     if (fPacketLossInFragmentedFrame) {
       // This packet is unusable; reject it:
       fReorderingBuffer->releaseUsedPacket(nextPacket);
       fNeedDelivery = True;
+	  if(bPrintLog)
+		envir().log("may lost frame! a middle rtp packet dropped!this frame lost part of it's data,all left rtp packets of this frame will be dropped. saved data will be cleaned up at start of next frame!\n");
       continue;
     }
 
@@ -181,6 +188,18 @@ void MultiFramedRTPSource::doGetNextFrame1() {
 void MultiFramedRTPSource
 ::setPacketReorderingThresholdTime(unsigned uSeconds) {
   fReorderingBuffer->setThresholdTime(uSeconds);
+}
+
+long long MultiFramedRTPSource::getFECRepairWindowTime() {
+	long long nowUsingInMicroSec = 0;
+	if (pFECInstance)
+	{
+		u_int8_t row, column;
+		long long repairWindow;
+		pFECInstance->get2DParityParameter(row, column, repairWindow);
+		nowUsingInMicroSec = repairWindow * 1000;  //ms => micro-second
+	}
+	return nowUsingInMicroSec;
 }
 
 #define ADVANCE(n) do { bPacket->skip(n); } while (0)

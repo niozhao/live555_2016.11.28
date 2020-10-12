@@ -5,6 +5,8 @@
 #include "FECCluster.hh"
 
 unsigned FECDecoder::totalRecoveredPackets = 0;
+u_int8_t FECDecoder::fInterleaveFormat = 0;
+u_int8_t FECDecoder::fNonInterleaveFormat = 0;
 
 #define RTP_HEADER_SIZE  12
 #define FEC_HEADER_SIZE  (12 + 4)
@@ -17,7 +19,13 @@ FECDecoder* FECDecoder::createNew() {
 
 FECDecoder::FECDecoder() {}
 
-void FECDecoder::repairCluster(RTPPacket** cluster, unsigned fRow, unsigned fColumn, unsigned ssrc) {
+void FECDecoder::setFECDecoderPar(u_int8_t interLeave, u_int8_t nonInterLeave)
+{
+	fInterleaveFormat = interLeave;
+	fNonInterleaveFormat = nonInterLeave;
+}
+
+unsigned FECDecoder::repairCluster(RTPPacket** cluster, unsigned fRow, unsigned fColumn, unsigned ssrc) {
 	unsigned numRecoveredUntilThisIteration = 0;
 	unsigned numRecoveredSoFar = 0;
 
@@ -33,9 +41,9 @@ void FECDecoder::repairCluster(RTPPacket** cluster, unsigned fRow, unsigned fCol
 	}
 
     totalRecoveredPackets += numRecoveredSoFar;
-
+	return numRecoveredSoFar;
 	
-	DebugPrintf("totalRecoveredPackets: %d\n",totalRecoveredPackets);
+	//DebugPrintf("totalRecoveredPackets: %d\n",totalRecoveredPackets);
 }
 
 RTPPacket* FECDecoder::repairRow(RTPPacket** row, unsigned size, unsigned ssrc, unsigned fRow, unsigned fColumn) {
@@ -110,9 +118,9 @@ u_int16_t FECDecoder::findSequenceNumber(RTPPacket** row, unsigned rowSize, unsi
     u_int16_t base = (((u_int16_t)fecPacket->content()[20]) << 8) | fecPacket->content()[21];
     for (unsigned i = 0; i < rowSize; i++) {
         if (row[i] == NULL) {
-            if (payload == 115) 
+			if (payload == fNonInterleaveFormat)
 				return base + i;
-            else if (payload == 116) 
+			else if (payload == fInterleaveFormat)
 				return base + i * fColumn;
         }
     }
@@ -297,10 +305,10 @@ void FECDecoder::printCluster(FECCluster* feccluster, unsigned fRow, unsigned fC
 	for (int i = 0; i < size; i++) {
 		RTPPacket* curr = cluster[i];
 		if (curr == NULL) 
-			strcat(debugString, "NULL  ");
+			strcat(debugString, "NULL      ");
 		else {
             int payload = EXTRACT_BIT_RANGE(0, 7, curr->content()[1]);
-            u_int16_t seq = payload == 115 || payload == 116 ? extractFECBase(curr) : extractRTPSeq(curr);
+			u_int16_t seq = payload == fNonInterleaveFormat || payload == fInterleaveFormat ? extractFECBase(curr) : extractRTPSeq(curr);
 			const char* tmpStr = FormatString("%d:%u  ", payload, seq);
 			strcat(debugString, tmpStr);
 			delete[] tmpStr;
@@ -308,7 +316,7 @@ void FECDecoder::printCluster(FECCluster* feccluster, unsigned fRow, unsigned fC
 		if ((i + 1) % (fColumn + 1) == 0)
 			strcat(debugString, "\n");
 	}
-	strcat(debugString, "\n\n");
+	strcat(debugString, "\n");
 	DebugPrintf("%s", debugString);
 }
 
