@@ -6,7 +6,7 @@
 #include <string.h>
 #include "GroupsockHelper.hh"
 #ifdef WIN32
-#include <Windows.h>
+#include <windows.h>
 #elif __ANDROID__
 #include <android/log.h>
 #define  LOG_TAG    "FEC"

@@ -23,7 +23,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include <stdlib.h>
 #include <stdio.h>
 #ifdef WIN32
-#include <Windows.h>
+#include <windows.h>
 #elif __ANDROID__
 #include <android/log.h>
 #define  LOG_TAG    "LIVE555"
