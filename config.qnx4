@@ -4,7 +4,7 @@
 #  Watcom 10.6
 #  TCP/IP 5.0
 #
-COMPILE_OPTS =		$(INCLUDES) -I. -D_QNX4 -DBSD -DSOCKLEN_T=uint32_t -I/usr/watcom/10.6/usr/include -march=armv7-a -mfpu=vfpv3-d16 -mcpu=cortex-a8 -mthumb -mfloat-abi=softfp -MMD -MP -fpic -ffunction-sections -funwind-tables -fstack-protector-strong -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -no-canonical-prefixes -fno-integrated-as -I/home/nio/Code/Work/VLC/vlc-android-1_src/vlc/contrib/arm-linux-androideabi/include -fexceptions  -march=armv7-a -mfpu=vfpv3-d16 -mcpu=cortex-a8 -mthumb -mfloat-abi=softfp -MMD -MP -fpic -ffunction-sections -funwind-tables -fstack-protector-strong -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -no-canonical-prefixes -fno-integrated-as -I/home/nio/Code/Work/VLC/vlc-android-1_src/vlc/contrib/arm-linux-androideabi/include -g -O2
+COMPILE_OPTS =		$(INCLUDES) -I. -D_QNX4 -DBSD -DSOCKLEN_T=uint32_t -I/usr/watcom/10.6/usr/include
 C =				c
 C_COMPILER =		cc32
 C_FLAGS =		$(COMPILE_OPTS)

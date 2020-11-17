@@ -3,7 +3,7 @@
 # See http://developer.axis.com/doc/software/apps/apps-howto.html
 # for more information.
 AXIS_DIR = $(AXIS_TOP_DIR)/target/cris-axis-linux-gnu
-COMPILE_OPTS = $(INCLUDES) -I. -mlinux -isystem $(AXIS_DIR)/include -Wall -O2 -DSOCKLEN_T=socklen_t -DCRIS -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64 -march=armv7-a -mfpu=vfpv3-d16 -mcpu=cortex-a8 -mthumb -mfloat-abi=softfp -MMD -MP -fpic -ffunction-sections -funwind-tables -fstack-protector-strong -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -no-canonical-prefixes -fno-integrated-as -I/home/nio/Code/Work/VLC/vlc-android-1_src/vlc/contrib/arm-linux-androideabi/include -fexceptions  -march=armv7-a -mfpu=vfpv3-d16 -mcpu=cortex-a8 -mthumb -mfloat-abi=softfp -MMD -MP -fpic -ffunction-sections -funwind-tables -fstack-protector-strong -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -no-canonical-prefixes -fno-integrated-as -I/home/nio/Code/Work/VLC/vlc-android-1_src/vlc/contrib/arm-linux-androideabi/include -g -O2
+COMPILE_OPTS = $(INCLUDES) -I. -mlinux -isystem $(AXIS_DIR)/include -Wall -O2 -DSOCKLEN_T=socklen_t -DCRIS -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64
 C =			c
 C_COMPILER =		gcc-cris
 C_FLAGS =		$(COMPILE_OPTS)
