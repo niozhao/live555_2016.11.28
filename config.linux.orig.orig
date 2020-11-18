@@ -1,15 +1,15 @@
 COMPILE_OPTS =		$(INCLUDES) -I. -O2 -DSOCKLEN_T=socklen_t -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64
 C =			c
-C_COMPILER =		/home/nio/Code/Work/VLC/vlc-android-1/toolchains/arm/bin/clang
+C_COMPILER =		cc
 C_FLAGS =		$(COMPILE_OPTS) $(CPPFLAGS) $(CFLAGS)
 CPP =			cpp
-CPLUSPLUS_COMPILER =	/home/nio/Code/Work/VLC/vlc-android-1/toolchains/arm/bin/clang++
+CPLUSPLUS_COMPILER =	c++
 CPLUSPLUS_FLAGS =	$(COMPILE_OPTS) -Wall -DBSD=1 $(CPPFLAGS) $(CXXFLAGS)
 OBJ =			o
-LINK =			/home/nio/Code/Work/VLC/vlc-android-1/toolchains/arm/bin/clang++ -o
-LINK_OPTS =		-L. $(LDFLAGS)
+LINK =			c++ -o
+LINK_OPTS =		-L. 
 CONSOLE_LINK_OPTS =	$(LINK_OPTS)
-LIBRARY_LINK = /home/nio/Code/Work/VLC/vlc-android-1/toolchains/arm/bin/arm-linux-androideabi-ar cr 
+LIBRARY_LINK =     ar cr 
 LIBRARY_LINK_OPTS =	
 LIB_SUFFIX =			a
 LIBS_FOR_CONSOLE_APPLICATION =
