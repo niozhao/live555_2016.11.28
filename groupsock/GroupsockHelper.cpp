@@ -518,15 +518,9 @@ Boolean socketJoinGroupSSM(UsageEnvironment& env, int socket,
   if (!IsMulticastAddress(groupAddress)) return True; // ignore this case
 
   struct ip_mreq_source imr;
-#ifdef __ANDROID__
-    imr.imr_multiaddr = groupAddress;
-    imr.imr_sourceaddr = sourceFilterAddr;
-    imr.imr_interface = ReceivingInterfaceAddr;
-#else
-    imr.imr_multiaddr.s_addr = groupAddress;
-    imr.imr_sourceaddr.s_addr = sourceFilterAddr;
-    imr.imr_interface.s_addr = ReceivingInterfaceAddr;
-#endif
+  imr.imr_multiaddr.s_addr = groupAddress;
+  imr.imr_sourceaddr.s_addr = sourceFilterAddr;
+  imr.imr_interface.s_addr = ReceivingInterfaceAddr;
   if (setsockopt(socket, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP,
 		 (const char*)&imr, sizeof (struct ip_mreq_source)) < 0) {
     socketErr(env, "setsockopt(IP_ADD_SOURCE_MEMBERSHIP) error: ");
@@ -544,15 +538,9 @@ Boolean socketLeaveGroupSSM(UsageEnvironment& /*env*/, int socket,
   if (!IsMulticastAddress(groupAddress)) return True; // ignore this case
 
   struct ip_mreq_source imr;
-#ifdef __ANDROID__
-    imr.imr_multiaddr = groupAddress;
-    imr.imr_sourceaddr = sourceFilterAddr;
-    imr.imr_interface = ReceivingInterfaceAddr;
-#else
-    imr.imr_multiaddr.s_addr = groupAddress;
-    imr.imr_sourceaddr.s_addr = sourceFilterAddr;
-    imr.imr_interface.s_addr = ReceivingInterfaceAddr;
-#endif
+  imr.imr_multiaddr.s_addr = groupAddress;
+  imr.imr_sourceaddr.s_addr = sourceFilterAddr;
+  imr.imr_interface.s_addr = ReceivingInterfaceAddr;
   if (setsockopt(socket, IPPROTO_IP, IP_DROP_SOURCE_MEMBERSHIP,
 		 (const char*)&imr, sizeof (struct ip_mreq_source)) < 0) {
     return False;
@@ -619,7 +607,7 @@ netAddressBits ourIPAddress(UsageEnvironment& env) {
     // that other nodes will think our address is the same as we do.)
     do {
       loopbackWorks = 0; // until we learn otherwise
-
+#ifndef DISABLE_LOOPBACK_IP_ADDRESS_CHECK
       testAddr.s_addr = our_inet_addr("228.67.43.91"); // arbitrary
       Port testPort(15947); // ditto
 
@@ -656,6 +644,7 @@ netAddressBits ourIPAddress(UsageEnvironment& env) {
 
       // We use this packet's source address, if it's good:
       loopbackWorks = !badAddressForUs(fromAddr.sin_addr.s_addr);
+#endif
     } while (0);
 
     if (sock >= 0) {
