@@ -40,19 +40,21 @@ extern "C" int initializeWinsockIfNecessary();
 # define MSG_NOSIGNAL 0
 #endif
 
-#define NDK_VERSION 14
+
 #ifdef __ANDROID__
 #include <android/api-level.h>
-#ifdef __ANDROID_API_O_MR1__
-#    include <android/ndk-version.h>
-#    ifdef __NDK_MAJOR__
+#  ifdef __ANDROID_API_O_MR1__
+#     include <android/ndk-version.h>
+#     ifdef __NDK_MAJOR__
 #        define NDK_VERSION   __NDK_MAJOR__
-#    else
+#     else
 #        define NDK_VERSION   16
-#    endif
+#     endif
+#  else
+#     define NDK_VERSION       14
+#  endif
 #else
-#    define NDK_VERSION       14
-#endif
+#    define NDK_VERSION       0
 #endif
 
 // By default, use INADDR_ANY for the sending and receiving interfaces:
@@ -533,7 +535,7 @@ Boolean socketJoinGroupSSM(UsageEnvironment& env, int socket,
   if (!IsMulticastAddress(groupAddress)) return True; // ignore this case
 
   struct ip_mreq_source imr;
-#ifdef __ANDROID__ && NDK_VERSION < 21
+#if defined(__ANDROID__) && NDK_VERSION < 21
     imr.imr_multiaddr = groupAddress;
     imr.imr_sourceaddr = sourceFilterAddr;
     imr.imr_interface = ReceivingInterfaceAddr;
@@ -559,7 +561,7 @@ Boolean socketLeaveGroupSSM(UsageEnvironment& /*env*/, int socket,
   if (!IsMulticastAddress(groupAddress)) return True; // ignore this case
 
   struct ip_mreq_source imr;
-#ifdef __ANDROID__ && NDK_VERSION < 21
+#if defined(__ANDROID__) && NDK_VERSION < 21
     imr.imr_multiaddr = groupAddress;
     imr.imr_sourceaddr = sourceFilterAddr;
     imr.imr_interface = ReceivingInterfaceAddr;
